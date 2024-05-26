@@ -24,6 +24,7 @@ def load_data(file="data/LmicX-14-04-33.wav"):
     w.data = w.data.ravel().astype(np.int64)
     return F, w.data
 
+
 def wavelet(signal, st, en, F, title="Wavelet", wavelet_t='cgau6', save=True, fft=True):
     """Wavelet-анализ и построение графиков."""
 
@@ -60,32 +61,12 @@ def wavelet(signal, st, en, F, title="Wavelet", wavelet_t='cgau6', save=True, ff
     plt.tight_layout()
     if save:
         plt.savefig('img/' + title)
-    #plt.show()
-    plt.close('all')
+    plt.show()
+    #plt.close('all')
     return x
 
-def filter_mean(signal, st, en, F, batch_size = 2, squares=False):
-    """Фильтрация сигнала с помощью подсчёта среднего."""
-    x = signal[int(st*F) : int(en*F)]
 
-    batches = [x[:batch_size*F]]
-    last_batch = 2
-    while st + last_batch < en:
-        batches.append(x[last_batch*F : (last_batch+batch_size)*F])
-        last_batch += batch_size
-
-    denoised_signal = []
-    for i in range(len(batches)):
-        if squares:
-            mean_val = np.sqrt(np.sum(batches[i]**2))/len(batches[i])
-        else:
-            mean_val = np.mean(batches[i])
-        denoised_signal.extend(batches[i] - mean_val)
-    
-    return denoised_signal
-
-def filter_highpass(signal, filter_cutoff = 0.02):
-    F, data = load_data()
+def filter_highpass(F, signal, filter_cutoff=0.02):
     b = scipy.signal.firwin(201, cutoff=F*filter_cutoff, fs=F, pass_zero='highpass')
     return scipy.signal.lfilter(b, [1.0], signal)
     # w, h = scipy.signal.freqz(b, fs=F)
